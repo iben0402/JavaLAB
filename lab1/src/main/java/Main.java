@@ -10,7 +10,7 @@ public class Main {
         Mage mage3 = new Mage("d", 12, 22.3, args[0]);
 
         Mage mage4 = new Mage("e", 56, 6.0, args[0]);
-        Mage mage5 = new Mage("f", 11, 18.3, args[0]);
+        Mage mage5 = new Mage("F", 11, 18.3, args[0]);
         Mage mage6 = new Mage("g", 1, 18.6, args[0]);
         Mage mage7 = new Mage("h", 7, 4.7, args[0]);
 
@@ -51,5 +51,6 @@ public class Main {
         mage0.addApprentice(mage3);
 
         System.out.println(mage0.printTree(0));
+        System.out.println(mage0.getAmountOfApprentices());
     }
 }

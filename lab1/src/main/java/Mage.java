@@ -1,7 +1,4 @@
-import java.util.HashSet;
-import java.util.Objects;
-import java.util.Set;
-import java.util.TreeSet;
+import java.util.*;
 
 public class Mage implements Comparable<Mage> {
     String name;
@@ -67,8 +64,6 @@ public class Mage implements Comparable<Mage> {
 
     public void addApprentice(Mage apprentice) {
         apprentices.add(apprentice);
-
-
     }
 
     @Override
@@ -98,6 +93,44 @@ public class Mage implements Comparable<Mage> {
         return ret;
     }
 
+    public Set<Mage> getAllApps() {
+        Set<Mage> mages = new TreeSet<>();
+        Set<Mage> magesChilds = new TreeSet<>();
+        mages.add(this);
+        for (Mage app:
+             apprentices) {
+            mages.add(app);
+            magesChilds = app.getAllApps();
+            mages.addAll(magesChilds);
+        }
+
+        return mages;
+    }
+
+    public Map getAmountOfApprentices() {
+        Map<Mage, Integer> amountOfApprentices;
+        if(sortingType>0) amountOfApprentices = new TreeMap<>();
+        else amountOfApprentices = new HashMap<>();
+        
+        Set<Mage> mages = getAllApps();
+
+        for (Mage mage :
+                mages) {
+            amountOfApprentices.put(mage, mage.countChildren());
+        }
+        return amountOfApprentices;
+    }
+
+    public int countChildren() {
+        int counter = 0;
+        for (Mage app:
+             apprentices) {
+            counter++;
+            counter += app.countChildren();
+        }
+        return counter;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -116,7 +149,7 @@ public class Mage implements Comparable<Mage> {
 
     @Override
     public int compareTo(Mage o) {
-        int ret = name.compareTo(o.getName());
+        int ret = name.compareToIgnoreCase(o.getName());
         if(ret == 0) {
             ret = level - o.getLevel();
         }
