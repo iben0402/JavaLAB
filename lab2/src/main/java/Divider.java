@@ -2,28 +2,38 @@ import java.util.ArrayList;
 
 public class Divider implements Runnable{
 
-    ArrayList<Integer> dividers;
-    private int number;
+    ArrayList<Integer> dividers = new ArrayList<Integer>();
+    private Resource resource;
 
-    public Divider(ArrayList<Integer> dividers, int number) {
-        this.dividers = dividers;
-        this.number = number;
+    public Divider(Resource resource) {
+        this.resource = resource;
     }
 
     @Override
     public void run() {
-        try {
-            Thread.sleep(4000);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-        for (int i = number; i > 0 ; i--) {
-            if(number % i == 0) {
-                dividers.add(i);
-                //System.out.println(i);
+        while(!Thread.currentThread().isInterrupted()) {
+            int number = 0;
+            try {
+                number = resource.take();
             }
+            catch (InterruptedException ex) {
+
+            }
+            System.out.println("Calculating dividers for: " + number);
+            try {
+                Thread.sleep(5000 + (number % 10)*1000);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+
+            for (int i = number; i > 0 ; i--) {
+                if(number % i == 0) {
+                    dividers.add(i);
+                }
+            }
+
+            resource.putToFile(number, dividers);
+            dividers.clear();
         }
-
-
     }
 }
