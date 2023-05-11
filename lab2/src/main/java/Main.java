@@ -52,7 +52,6 @@ public class Main {
             if(input.equals("exit")) {
                 for (int i = 0; i < amount_of_threads; i++) {
                     threads[i].interrupt();
-                    //threads[i].join();
                     System.out.println("killed thread");
                 }
 

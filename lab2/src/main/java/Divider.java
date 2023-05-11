@@ -17,7 +17,7 @@ public class Divider implements Runnable{
                 number = resource.take();
             }
             catch (InterruptedException ex) {
-
+                break;
             }
             System.out.println("Calculating dividers for: " + number);
             try {
