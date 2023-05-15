@@ -1,0 +1,4 @@
+com\iwona\client\Client.class
+com\iwona\message\Messsage.class
+com\iwona\server\MessageEncoder.class
+com\iwona\server\Server.class
