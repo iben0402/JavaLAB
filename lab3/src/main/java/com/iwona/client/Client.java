@@ -11,33 +11,31 @@ import java.io.IOException;
 import java.io.ObjectOutputStream;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.nio.ByteBuffer;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Scanner;
 
 @ClientEndpoint
 public class Client extends WebSocketClient {
-    public Client(URI serverUri, Draft draft) {
-        super(serverUri, draft);
-    }
+    boolean serverReadyForMessages = false;
 
     public Client(URI serverURI) {
         super(serverURI);
     }
 
-    public Client(URI serverUri, Map<String, String> httpHeaders) {
-        super(serverUri, httpHeaders);
-    }
-
     @Override
     public void onOpen(ServerHandshake handshakedata) {
-        send("Hello, it is me. Mario :)");
         System.out.println("opened connection");
-        // if you plan to refuse connection based on ip or httpfields overload: onWebsocketHandshakeReceivedAsClient
     }
 
     @Override
     public void onMessage(String message) {
+
         System.out.println("received: " + message);
+        if(Objects.equals(message, "ready for messages")) {
+            serverReadyForMessages = true;
+        }
     }
 
     @Override
@@ -51,18 +49,37 @@ public class Client extends WebSocketClient {
     @Override
     public void onError(Exception ex) {
         ex.printStackTrace();
-        // if the error is fatal then onClose will be called additionally
     }
 
-    public static void main(String[] args) throws URISyntaxException {
+    public static void main(String[] args) throws URISyntaxException, InterruptedException {
         Client c = new Client(new URI(
-                "ws://localhost:8887")); // more about drafts here: http://github.com/TooTallNate/Java-WebSocket/wiki/Drafts
+                "ws://localhost:8887"));
         c.connect();
 
         Scanner scanner = new Scanner(System.in);
+
+        int inputN = scanner.nextInt();
+        // Send n to server
+        ByteBuffer b = ByteBuffer.allocate(4);
+        b.putInt(inputN);
+        b.flip();
+        byte[] bytes = new byte[4];
+        b.get(bytes);
+        //byte[] message = b.array();
+        c.send(bytes);
+
+        //waiting for server
+        while(!c.serverReadyForMessages) {
+
+        }
+
+        // ready for messages
+        System.out.print("Enter a message (or 'quit' to exit): ");
+        int n = 0;
         String input = "";
-        while (!input.equals("quit")) {
-            System.out.print("Enter a command (or 'quit' to exit): ");
+        scanner.nextLine();
+        while (!input.equals("quit") || n == inputN) {
+            System.out.print("Enter a message (or 'quit' to exit): ");
             input = scanner.nextLine();
             System.out.println("You entered: " + input);
             String[] textMessage = input.split(" ");
@@ -85,11 +102,12 @@ public class Client extends WebSocketClient {
                     // ignore close exception
                 }
             }
-
+            n++;
 
 
         }
         scanner.close();
         System.out.println("Exiting...");
+
     }
 }
